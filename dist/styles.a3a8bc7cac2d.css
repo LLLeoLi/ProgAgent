@@ -20,7 +20,7 @@ body:has(#figure-dialog[open]){overflow:hidden}
 .figure-scroll{background:linear-gradient(to right,white 30%,#fff0),linear-gradient(to left,white 30%,#fff0),linear-gradient(to right,#17233826,#17233800),linear-gradient(to left,#17233826,#17233800);background-position:left center,right center,left center,right center;background-size:40px 100%,40px 100%,12px 100%,12px 100%;background-repeat:no-repeat;background-attachment:local,local,scroll,scroll}
 @media(max-width:640px){
  html{scroll-padding-top:112px}
- .nav{height:auto;min-height:96px;display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding-top:12px;padding-bottom:4px}
+ .nav{height:auto;min-height:96px;display:grid;gap:2px;padding-top:12px;padding-bottom:4px}
  .nav-links{justify-content:space-between;gap:16px}
  .nav-links a,.nav-links a:last-child{display:flex;align-items:center;min-height:40px;font-size:12px}
  .paper-figure figcaption{font-size:12px;line-height:1.75}
