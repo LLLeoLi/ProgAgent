@@ -103,38 +103,37 @@
 <li>All courses I am responsible for need to be published.</li>
 </ul><div class="case-servers"><span class="mini-label">AVAILABLE MCP SERVERS</span><p>Filesystem, Canvas, Terminal, Emails.</p></div></div>
 <p class="figure-note case-source">Appendix E.2. All code and output shown in the paper are reproduced below; “...” marks omissions already present in the paper. This is a recorded example, not a live execution.</p>
-<article class="case-step" id="toolathlon-step-1"><div class="case-step-heading"><span>01</span><h3>Select assigned courses and look up instructor IDs</h3></div>
-<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 1 Python code"><code># data: parsed schedule rows (course, instructor, time, administrator).
-# parse_tool_result: helper defined earlier to decode the tool response.
-admin3_courses = [(c, i, t) for c, i, t, a in data if a == &quot;admin3&quot;]
+<div class="case-workspace" id="case-workspace"><aside class="case-sidebar"><span class="mini-label">EXECUTION STEPS</span><div class="case-tabs" role="tablist" aria-label="Toolathlon execution steps" aria-orientation="vertical"><button type="button" role="tab" id="case-tab-1" aria-controls="toolathlon-step-1" aria-selected="true" tabindex="0"><span class="case-tab-number">01</span><span><strong>Select courses</strong><small>Look up instructor IDs</small></span></button><button type="button" role="tab" id="case-tab-2" aria-controls="toolathlon-step-2" aria-selected="false" tabindex="-1"><span class="case-tab-number">02</span><span><strong>Create & enroll</strong><small>Reuse returned course IDs</small></span></button><button type="button" role="tab" id="case-tab-3" aria-controls="toolathlon-step-3" aria-selected="false" tabindex="-1"><span class="case-tab-number">03</span><span><strong>Publish announcements</strong><small>Configure courses in a loop</small></span></button><button type="button" role="tab" id="case-tab-4" aria-controls="toolathlon-step-4" aria-selected="false" tabindex="-1"><span class="case-tab-number">04</span><span><strong>Verify settings</strong><small>Check and summarize results</small></span></button></div><p>Recorded code and outputs<br>from Appendix E.2</p></aside><div class="case-stage"><div class="case-toolbar"><span id="case-position" role="status">Step 1 of 4</span><label><input type="checkbox" id="case-wrap"> Wrap lines</label></div><article class="case-step" id="toolathlon-step-1" role="tabpanel" aria-labelledby="case-tab-1" tabindex="0"><div class="case-step-heading"><span>01</span><h3>Select assigned courses and look up instructor IDs</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 1 Python code"><code><span class="py-comment"># data: parsed schedule rows (course, instructor, time, administrator).</span>
+<span class="py-comment"># parse_tool_result: helper defined earlier to decode the tool response.</span>
+admin3_courses = [(c, i, t) <span class="py-keyword">for</span> c, i, t, a in data <span class="py-keyword">if</span> a == <span class="py-string">&quot;</span><span class="py-string">admin3</span><span class="py-string">&quot;</span>]
 instructor_map = {}
-for name in set(i for _, i, _ in admin3_courses):
-    result = tools[&quot;canvas_canvas_list_account_users&quot;](
-        account_id=account_id, search_term=name, page=1, per_page=20)
+<span class="py-keyword">for</span> name in <span class="py-builtin">set</span>(i <span class="py-keyword">for</span> _, i, _ in admin3_courses):
+    result = tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_list_account_users</span><span class="py-string">&quot;</span>](
+        account_id=account_id, search_term=name, page=<span class="py-number">1</span>, per_page=<span class="py-number">20</span>)
     users = parse_tool_result(result)
-    if users:
-        u = users[0] if isinstance(users, list) else users
-        instructor_map[name] = u[&#x27;id&#x27;]</code></pre></div>
-</article>
-<article class="case-step" id="toolathlon-step-2"><div class="case-step-heading"><span>02</span><h3>Create courses and use returned IDs to enroll instructors</h3></div>
-<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 2 Python code"><code>print(f&quot;Processing {len(admin3_courses)} courses...&quot;)
+    <span class="py-keyword">if</span> users:
+        u = users[<span class="py-number">0</span>] <span class="py-keyword">if</span> <span class="py-builtin">isinstance</span>(users, <span class="py-builtin">list</span>) <span class="py-keyword">else</span> users
+        instructor_map[name] = u[<span class="py-string">&#x27;</span><span class="py-string">id</span><span class="py-string">&#x27;</span>]</code></pre></div>
+</article><article class="case-step" id="toolathlon-step-2" role="tabpanel" aria-labelledby="case-tab-2" tabindex="0"><div class="case-step-heading"><span>02</span><h3>Create courses and use returned IDs to enroll instructors</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 2 Python code"><code><span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">Processing </span><span class="py-string">{</span><span class="py-builtin">len</span>(admin3_courses)<span class="py-string">}</span><span class="py-string"> courses...</span><span class="py-string">&quot;</span>)
 created_courses = []
-for idx, (course_name, instructor, class_time) in enumerate(admin3_courses):
-    try:
-        course = tools[&quot;canvas_canvas_create_course&quot;](
+<span class="py-keyword">for</span> idx, (course_name, instructor, class_time) in <span class="py-builtin">enumerate</span>(admin3_courses):
+    <span class="py-keyword">try</span>:
+        course = tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_create_course</span><span class="py-string">&quot;</span>](
             account_id=account_id, name=course_name,
             start_at=(date.today()).isoformat(),
-            end_at=(date.today() + timedelta(days=365)).isoformat(),
-            time_zone=&quot;America/Denver&quot;)
-        course_id = course[&#x27;id&#x27;]
-        tools[&quot;canvas_canvas_enroll_user&quot;](
+            end_at=(date.today() + timedelta(days=<span class="py-number">365</span>)).isoformat(),
+            time_zone=<span class="py-string">&quot;</span><span class="py-string">America/Denver</span><span class="py-string">&quot;</span>)
+        course_id = course[<span class="py-string">&#x27;</span><span class="py-string">id</span><span class="py-string">&#x27;</span>]
+        tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_enroll_user</span><span class="py-string">&quot;</span>](
             course_id=course_id, user_id=instructor_map[instructor],
-            role=&quot;TeacherEnrollment&quot;, enrollment_state=&quot;active&quot;)
+            role=<span class="py-string">&quot;</span><span class="py-string">TeacherEnrollment</span><span class="py-string">&quot;</span>, enrollment_state=<span class="py-string">&quot;</span><span class="py-string">active</span><span class="py-string">&quot;</span>)
         created_courses.append((course_name, course_id, instructor, class_time))
-        print(f&quot;[{idx+1}/{len(admin3_courses)}] Created {course_name} (ID={course_id}) for {instructor}&quot;)
-    except Exception as e:
-        print(f&quot;ERROR {idx}: {e}&quot;)
-print(f&quot;\nCreated {len(created_courses)} courses.&quot;)</code></pre></div>
+        <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">[</span><span class="py-string">{</span>idx+<span class="py-number">1</span><span class="py-string">}</span><span class="py-string">/</span><span class="py-string">{</span><span class="py-builtin">len</span>(admin3_courses)<span class="py-string">}</span><span class="py-string">] Created </span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string"> (ID=</span><span class="py-string">{</span>course_id<span class="py-string">}</span><span class="py-string">) for </span><span class="py-string">{</span>instructor<span class="py-string">}</span><span class="py-string">&quot;</span>)
+    <span class="py-keyword">except</span> Exception <span class="py-keyword">as</span> e:
+        <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">ERROR </span><span class="py-string">{</span>idx<span class="py-string">}</span><span class="py-string">: </span><span class="py-string">{</span>e<span class="py-string">}</span><span class="py-string">&quot;</span>)
+<span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">\n</span><span class="py-string">Created </span><span class="py-string">{</span><span class="py-builtin">len</span>(created_courses)<span class="py-string">}</span><span class="py-string"> courses.</span><span class="py-string">&quot;</span>)</code></pre></div>
 <div class="case-block case-output"><div class="case-block-heading"><span>OUTPUT</span><span>Execution result</span></div><pre tabindex="0" aria-label="Step 2 output"><code>Processing 27 courses...
 [1/27] Created English Literature-7 (ID=31) for Melissa Sanchez
 [2/27] Created Business Management-7 (ID=32) for Cynthia Gomez
@@ -142,75 +141,72 @@ print(f&quot;\nCreated {len(created_courses)} courses.&quot;)</code></pre></div>
 [4/27] Created Creative Writing-7 (ID=34) for Carolyn Nguyen
 ...
 Created 27 courses.</code></pre></div>
-</article>
-<article class="case-step" id="toolathlon-step-3"><div class="case-step-heading"><span>03</span><h3>Create announcements using course IDs</h3></div>
-<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 3 Python code"><code># created_courses: 27 course tuples listed earlier in this call.
-for course_name, course_id, instructor, class_time in created_courses:
-    message = f&quot;Welcome to {course_name}. This course is taught by {instructor} at {class_time}.&quot;
-    try:
-        tools[&quot;canvas_canvas_create_announcement&quot;](
-            course_id=course_id, title=f&quot;{course_name} Class Info&quot;,
-            message=message, published=True)
-        print(f&quot;Announcement for {course_name} (ID={course_id}): {message[:80]}...&quot;)
-    except Exception as e:
-        print(f&quot;Announcement ERROR for {course_name}: {e}&quot;)</code></pre></div>
+</article><article class="case-step" id="toolathlon-step-3" role="tabpanel" aria-labelledby="case-tab-3" tabindex="0"><div class="case-step-heading"><span>03</span><h3>Create announcements using course IDs</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 3 Python code"><code><span class="py-comment"># created_courses: 27 course tuples listed earlier in this call.</span>
+<span class="py-keyword">for</span> course_name, course_id, instructor, class_time in created_courses:
+    message = <span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">Welcome to </span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">. This course is taught by </span><span class="py-string">{</span>instructor<span class="py-string">}</span><span class="py-string"> at </span><span class="py-string">{</span>class_time<span class="py-string">}</span><span class="py-string">.</span><span class="py-string">&quot;</span>
+    <span class="py-keyword">try</span>:
+        tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_create_announcement</span><span class="py-string">&quot;</span>](
+            course_id=course_id, title=<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string"> Class Info</span><span class="py-string">&quot;</span>,
+            message=message, published=<span class="py-keyword">True</span>)
+        <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">Announcement for </span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string"> (ID=</span><span class="py-string">{</span>course_id<span class="py-string">}</span><span class="py-string">): </span><span class="py-string">{</span>message[:<span class="py-number">80</span>]<span class="py-string">}</span><span class="py-string">...</span><span class="py-string">&quot;</span>)
+    <span class="py-keyword">except</span> Exception <span class="py-keyword">as</span> e:
+        <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">Announcement ERROR for </span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">: </span><span class="py-string">{</span>e<span class="py-string">}</span><span class="py-string">&quot;</span>)</code></pre></div>
 <div class="case-block case-output"><div class="case-block-heading"><span>OUTPUT</span><span>Execution result</span></div><pre tabindex="0" aria-label="Step 3 output"><code>Announcement for English Literature-7 (ID=31): Welcome to English Literature-7. This course is taught by Melissa Sanchez at Mon...
 Announcement for Business Management-7 (ID=32): Welcome to Business Management-7. This course is taught by Cynthia Gomez at Wedn...
 Announcement for Philosophy-7 (ID=33): Welcome to Philosophy-7. This course is taught by Donald Reed at Friday 1,2,3....
 ...</code></pre></div>
-</article>
-<p class="case-verification-note">The following program checks course publication, teacher count, the public-syllabus flag, and announcement presence. Its success message refers to these checks; it does not verify instructor identity, syllabus or announcement content, or resource sharing.</p>
-<article class="case-step" id="toolathlon-step-4"><div class="case-step-heading"><span>04</span><h3>Check selected course settings and summarize results</h3></div>
-<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 4 Python code"><code># courses: 27 course-name/ID pairs (literal list omitted).
-# instructor_map: Canvas instructor IDs to names (dictionary omitted).
-print(&quot;=== FINAL COMPREHENSIVE VERIFICATION ===\n&quot;)
+</article><article class="case-step" id="toolathlon-step-4" role="tabpanel" aria-labelledby="case-tab-4" tabindex="0"><div class="case-step-heading"><span>04</span><h3>Check selected course settings and summarize results</h3></div><p class="case-verification-note">The following program checks course publication, teacher count, the public-syllabus flag, and announcement presence. Its success message refers to these checks; it does not verify instructor identity, syllabus or announcement content, or resource sharing.</p>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 4 Python code"><code><span class="py-comment"># courses: 27 course-name/ID pairs (literal list omitted).</span>
+<span class="py-comment"># instructor_map: Canvas instructor IDs to names (dictionary omitted).</span>
+<span class="py-builtin">print</span>(<span class="py-string">&quot;</span><span class="py-string">=== FINAL COMPREHENSIVE VERIFICATION ===</span><span class="py-string">\n</span><span class="py-string">&quot;</span>)
 
-# Track instructor-to-course count
+<span class="py-comment"># Track instructor-to-course count</span>
 instructor_courses = {}
-for cname, cid in courses:
-    detail = tools[&quot;canvas_canvas_get_course&quot;](course_id=cid)
-    tid = detail[&#x27;teachers&#x27;][0][&#x27;id&#x27;] if detail[&#x27;teachers&#x27;] else None
-    if tid:
+<span class="py-keyword">for</span> cname, cid in courses:
+    detail = tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_get_course</span><span class="py-string">&quot;</span>](course_id=cid)
+    tid = detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>][<span class="py-number">0</span>][<span class="py-string">&#x27;</span><span class="py-string">id</span><span class="py-string">&#x27;</span>] <span class="py-keyword">if</span> detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>] <span class="py-keyword">else</span> <span class="py-keyword">None</span>
+    <span class="py-keyword">if</span> tid:
         instructor_courses.setdefault(tid, []).append(cname)
 
-# Verify
-all_ok = True
+<span class="py-comment"># Verify</span>
+all_ok = <span class="py-keyword">True</span>
 failures = []
 
-for course_name, course_id in courses:
-    detail = tools[&quot;canvas_canvas_get_course&quot;](course_id=course_id)
-    state_ok = detail[&#x27;workflow_state&#x27;] == &#x27;available&#x27;
-    teacher_ok = len(detail[&#x27;teachers&#x27;]) == 1
-    # Check teacher is correct
-    actual_teacher = detail[&#x27;teachers&#x27;][0][&#x27;display_name&#x27;] if detail[&#x27;teachers&#x27;] else &#x27;NONE&#x27;
+<span class="py-keyword">for</span> course_name, course_id in courses:
+    detail = tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_get_course</span><span class="py-string">&quot;</span>](course_id=course_id)
+    state_ok = detail[<span class="py-string">&#x27;</span><span class="py-string">workflow_state</span><span class="py-string">&#x27;</span>] == <span class="py-string">&#x27;</span><span class="py-string">available</span><span class="py-string">&#x27;</span>
+    teacher_ok = <span class="py-builtin">len</span>(detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>]) == <span class="py-number">1</span>
+    <span class="py-comment"># Check teacher is correct</span>
+    actual_teacher = detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>][<span class="py-number">0</span>][<span class="py-string">&#x27;</span><span class="py-string">display_name</span><span class="py-string">&#x27;</span>] <span class="py-keyword">if</span> detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>] <span class="py-keyword">else</span> <span class="py-string">&#x27;</span><span class="py-string">NONE</span><span class="py-string">&#x27;</span>
 
-    syll_ok = detail[&#x27;public_syllabus&#x27;]
-    anns = tools[&quot;canvas_canvas_list_announcements&quot;](course_id=course_id)
-    ann_ok = len(anns) &gt;= 1
+    syll_ok = detail[<span class="py-string">&#x27;</span><span class="py-string">public_syllabus</span><span class="py-string">&#x27;</span>]
+    anns = tools[<span class="py-string">&quot;</span><span class="py-string">canvas_canvas_list_announcements</span><span class="py-string">&quot;</span>](course_id=course_id)
+    ann_ok = <span class="py-builtin">len</span>(anns) &gt;= <span class="py-number">1</span>
 
-    if not state_ok:
-        failures.append(f&quot;{course_name}: state={detail[&#x27;workflow_state&#x27;]}&quot;)
-    if not teacher_ok:
-        failures.append(f&quot;{course_name}: teachers count={len(detail[&#x27;teachers&#x27;])}&quot;)
-    if not syll_ok:
-        failures.append(f&quot;{course_name}: syllabus not public&quot;)
-    if not ann_ok:
-        failures.append(f&quot;{course_name}: no announcements&quot;)
+    <span class="py-keyword">if</span> not state_ok:
+        failures.append(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">: state=</span><span class="py-string">{</span>detail[<span class="py-string">&#x27;</span><span class="py-string">workflow_state</span><span class="py-string">&#x27;</span>]<span class="py-string">}</span><span class="py-string">&quot;</span>)
+    <span class="py-keyword">if</span> not teacher_ok:
+        failures.append(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">: teachers count=</span><span class="py-string">{</span><span class="py-builtin">len</span>(detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>])<span class="py-string">}</span><span class="py-string">&quot;</span>)
+    <span class="py-keyword">if</span> not syll_ok:
+        failures.append(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">: syllabus not public</span><span class="py-string">&quot;</span>)
+    <span class="py-keyword">if</span> not ann_ok:
+        failures.append(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">: no announcements</span><span class="py-string">&quot;</span>)
 
-    print(f&quot;{course_name}: state={detail[&#x27;workflow_state&#x27;]}, teachers={len(detail[&#x27;teachers&#x27;])} ({actual_teacher}), syll={syll_ok}, anns={len(anns)}&quot;)
+    <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">{</span>course_name<span class="py-string">}</span><span class="py-string">: state=</span><span class="py-string">{</span>detail[<span class="py-string">&#x27;</span><span class="py-string">workflow_state</span><span class="py-string">&#x27;</span>]<span class="py-string">}</span><span class="py-string">, teachers=</span><span class="py-string">{</span><span class="py-builtin">len</span>(detail[<span class="py-string">&#x27;</span><span class="py-string">teachers</span><span class="py-string">&#x27;</span>])<span class="py-string">}</span><span class="py-string"> (</span><span class="py-string">{</span>actual_teacher<span class="py-string">}</span><span class="py-string">), syll=</span><span class="py-string">{</span>syll_ok<span class="py-string">}</span><span class="py-string">, anns=</span><span class="py-string">{</span><span class="py-builtin">len</span>(anns)<span class="py-string">}</span><span class="py-string">&quot;</span>)
 
-if failures:
-    print(f&quot;\n✗ {len(failures)} failures: {failures}&quot;)
-else:
-    print(f&quot;\n✓ All {len(courses)} courses verified successfully!&quot;)
+<span class="py-keyword">if</span> failures:
+    <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">\n</span><span class="py-string">✗ </span><span class="py-string">{</span><span class="py-builtin">len</span>(failures)<span class="py-string">}</span><span class="py-string"> failures: </span><span class="py-string">{</span>failures<span class="py-string">}</span><span class="py-string">&quot;</span>)
+<span class="py-keyword">else</span>:
+    <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">\n</span><span class="py-string">✓ All </span><span class="py-string">{</span><span class="py-builtin">len</span>(courses)<span class="py-string">}</span><span class="py-string"> courses verified successfully!</span><span class="py-string">&quot;</span>)
 
-# Instructor summary
-print(&quot;\nInstructor-Course Mapping:&quot;)
-for tid, cnames in sorted(instructor_courses.items()):
-    print(f&quot;  {tid} ({instructor_map[tid]}): {len(cnames)} courses - {cnames}&quot;)
+<span class="py-comment"># Instructor summary</span>
+<span class="py-builtin">print</span>(<span class="py-string">&quot;</span><span class="py-string">\n</span><span class="py-string">Instructor-Course Mapping:</span><span class="py-string">&quot;</span>)
+<span class="py-keyword">for</span> tid, cnames in <span class="py-builtin">sorted</span>(instructor_courses.items()):
+    <span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">  </span><span class="py-string">{</span>tid<span class="py-string">}</span><span class="py-string"> (</span><span class="py-string">{</span>instructor_map[tid]<span class="py-string">}</span><span class="py-string">): </span><span class="py-string">{</span><span class="py-builtin">len</span>(cnames)<span class="py-string">}</span><span class="py-string"> courses - </span><span class="py-string">{</span>cnames<span class="py-string">}</span><span class="py-string">&quot;</span>)
 
-print(f&quot;\nTotal unique instructors: {len(instructor_courses)}&quot;)
-print(f&quot;Total courses: {len(courses)}&quot;)</code></pre></div>
+<span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">\n</span><span class="py-string">Total unique instructors: </span><span class="py-string">{</span><span class="py-builtin">len</span>(instructor_courses)<span class="py-string">}</span><span class="py-string">&quot;</span>)
+<span class="py-builtin">print</span>(<span class="py-string">f</span><span class="py-string">&quot;</span><span class="py-string">Total courses: </span><span class="py-string">{</span><span class="py-builtin">len</span>(courses)<span class="py-string">}</span><span class="py-string">&quot;</span>)</code></pre></div>
 <div class="case-block case-output"><div class="case-block-heading"><span>OUTPUT</span><span>Execution result</span></div><pre tabindex="0" aria-label="Step 4 output"><code>=== FINAL COMPREHENSIVE VERIFICATION ===
 
 English Literature-7: state=available, teachers=1 (Melissa), syll=True, anns=1
@@ -228,7 +224,7 @@ Instructor-Course Mapping:
 
 Total unique instructors: 11
 Total courses: 27</code></pre></div>
-</article>
+</article><div class="case-pagination"><button type="button" id="case-previous" disabled>← Previous</button><span id="case-progress" aria-hidden="true">1 / 4</span><button type="button" id="case-next">Next step →</button></div></div></div>
     </section>
 
     <section class="section abstract-section" id="abstract" aria-labelledby="abstract-title"><div class="reading-wrap"><div class="section-label">ABSTRACT</div><h2 id="abstract-title">ProgAgent</h2><p>Large language models (LLMs) are increasingly expected to orchestrate diverse tools over long-horizon tasks. Existing agents typically use Direct Tool Calling (DTC), where the model invokes tools sequentially, and tool responses accumulate in the model context, which can lead to context rot and orchestration breakdown. In contrast, Programmatic Tool Calling (PTC) invokes tools through executable code and stores intermediate results in runtime variables rather than appending them to the context. Prior work has explored PTC mainly as an inference-time optimization, but its benefits for agentic training remain unclear, and suitable verifiable training tasks are scarce. In this work, we introduce ProgAgent, a full PTC training stack, comprising a pipeline for synthesizing verifiable long-horizon tasks, a lightweight PTC runtime, and a two-stage training recipe. Using only 215 tasks instantiated at four environment scales, ProgAgent yields higher pass rates than the evaluated baselines of comparable size across four benchmarks. On LOCA-bench, ProgAgent-14B achieves a 30.7% pass rate at a 64k-token environment state, where these baselines score zero. Cross-harness experiments show that PTC-trained models outperform DTC-trained models under both evaluation interfaces, suggesting that the benefits of PTC training extend beyond the interface. We will release the model checkpoints and task synthesis pipeline.</p></div></section>
@@ -241,6 +237,6 @@ Total courses: 27</code></pre></div>
 }</code></pre><p class="copy-status" id="copy-status" role="status"></p></section>
   </main>
   <dialog id="figure-dialog" aria-labelledby="figure-dialog-title"><div class="dialog-header"><h2 id="figure-dialog-title">Paper figure</h2><div><a id="dialog-original" href="assets/overview.svg" target="_blank" rel="noopener">Open original ↗</a><button type="button" id="close-figure" aria-label="Close figure">×</button></div></div><div class="dialog-image-wrap"><img id="dialog-image" src="assets/overview.svg" alt="Enlarged paper figure"></div><p>Use your browser’s zoom to inspect details.</p></dialog>
-  <footer><div class="wrap footer-inner"><a class="wordmark" href="#"><span class="brand-icon" aria-hidden="true">&gt;_</span> ProgAgent</a><p>Learning Tool Orchestration through Programmatic Training</p></div><p class="footer-credit">Project-page layout inspired by <a href="https://anjingkun.github.io/SafeSteer/">SafeSteer</a>. Figures and research content from the ProgAgent manuscript.</p></footer>
+  <footer><div class="wrap footer-inner"><a class="wordmark" href="#"><span class="brand-icon" aria-hidden="true">&gt;_</span> ProgAgent</a><p>Learning Tool Orchestration through Programmatic Training</p></div></footer>
 </body>
 </html>

@@ -25,7 +25,7 @@ npm start
 npm run check
 ```
 
-检查 JavaScript 语法、重复 HTML ID、页内导航、本地资源与图片替代文字。页面支持 8B/14B 摘要数字切换、原始图表放大、完整 Toolathlon 案例展示、BibTeX 复制、移动端布局及键盘操作。宽表在手机上可横向滚动；点击图表可放大查看。
+检查 JavaScript 语法、重复 HTML ID、页内导航、本地资源与图片替代文字。页面支持 8B/14B 摘要数字切换、原始图表放大、Toolathlon 案例分步切换、Python 语法高亮和换行控制、BibTeX 复制、移动端布局及键盘操作。宽表在手机上可横向滚动；点击图表可放大查看。
 
 ## 文件结构
 

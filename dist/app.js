@@ -47,3 +47,47 @@ document.querySelector('#copy-citation').addEventListener('click', async () => {
     status.textContent = 'Citation selected. Press Ctrl+C (or ⌘C) to copy.';
   }
 });
+
+// Keep all four original steps in the document; only the selected panel is visible.
+const caseWorkspace = document.querySelector('#case-workspace');
+const caseTabs = [...document.querySelectorAll('.case-tabs [role="tab"]')];
+const casePanels = [...document.querySelectorAll('.case-step[role="tabpanel"]')];
+let caseIndex = 0;
+function selectCaseStep(index, focusTab = false) {
+  caseIndex = index;
+  caseTabs.forEach((tab, i) => {
+    tab.setAttribute('aria-selected', String(i === index));
+    tab.tabIndex = i === index ? 0 : -1;
+    casePanels[i].hidden = i !== index;
+  });
+  document.querySelector('#case-position').textContent = `Step ${index + 1} of ${caseTabs.length}`;
+  document.querySelector('#case-progress').textContent = `${index + 1} / ${caseTabs.length}`;
+  document.querySelector('#case-previous').disabled = index === 0;
+  document.querySelector('#case-next').disabled = index === caseTabs.length - 1;
+  if (focusTab) caseTabs[index].focus();
+}
+caseTabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectCaseStep(index));
+  tab.addEventListener('keydown', event => {
+    let next;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = (index + 1) % caseTabs.length;
+    else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') next = (index + caseTabs.length - 1) % caseTabs.length;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = caseTabs.length - 1;
+    if (next === undefined) return;
+    event.preventDefault();
+    selectCaseStep(next, true);
+  });
+});
+function advanceCaseStep(delta) {
+  const next = caseIndex + delta;
+  if (next < 0 || next >= caseTabs.length) return;
+  selectCaseStep(next);
+  casePanels[next].focus({ preventScroll: true });
+  if (caseWorkspace.getBoundingClientRect().top < 75) caseWorkspace.scrollIntoView({ block: 'start' });
+}
+document.querySelector('#case-previous').addEventListener('click', () => advanceCaseStep(-1));
+document.querySelector('#case-next').addEventListener('click', () => advanceCaseStep(1));
+document.querySelector('#case-wrap').addEventListener('change', event => caseWorkspace.classList.toggle('wrap-code', event.target.checked));
+caseWorkspace.classList.add('enhanced');
+selectCaseStep(0);
