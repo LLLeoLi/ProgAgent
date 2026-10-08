@@ -56,7 +56,7 @@ scripts/
 - 更新 8B/14B 摘要数字：`dist/app.js` 中 `scores`，同时更新 HTML 默认显示的 14B 结果、首屏统计和相关文案。正文的完整图表直接来自论文。
 - 更新 Experimental Results 与 Analysis：`dist/index.html` 的 `#results` / `#analysis`，文案沿用论文对应小节的表述。
 - 更新论文：替换 `dist/assets/ProgAgent.pdf`，并同步图表、原图和引用信息。
-- GitHub 按钮指向用户提供的代码仓库：<https://github.com/LLLeoLi/verl>。模型与 SFT 数据按钮使用 Hugging Face 标识。
+- GitHub 按钮指向用户提供的代码仓库：<https://github.com/LLLeoLi/verl>。单个 Hugging Face 按钮链接到同时包含模型与 SFT 数据的 collection。
 - BibTeX 按用户提供的格式使用 `@misc{li2026progagent}`，年份为 2026，URL 为项目页；作者列表保留论文信息。
 
 ## 导入论文图表
