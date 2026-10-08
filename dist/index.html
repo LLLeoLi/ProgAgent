@@ -20,7 +20,6 @@
     <nav class="nav wrap" aria-label="Main navigation">
       <a class="wordmark" href="#"><span class="brand-icon" aria-hidden="true">&gt;_</span> ProgAgent</a>
       <div class="nav-links"><a href="#method">Environments</a><a href="#results">Results</a><a href="#analysis">Analysis</a><a href="#examples">Example</a></div>
-      <a class="home-link" href="https://llleoli.github.io/">Hao Li’s homepage <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
 
@@ -96,19 +95,145 @@
     </div></section>
 
     <section class="section wrap" id="examples" aria-labelledby="example-title">
-      <div class="section-label">04 / PTC IN PRACTICE</div><h2 id="example-title">MCP-Atlas: From Campaign Records to a Statistical Answer</h2><p class="section-intro">A recorded MCP-Atlas example: analyze campaigns spending less than $800, find the most common ad type, and the average reach of the least common type.</p>
-      <div class="example-shell"><div class="example-sidebar"><span class="mini-label">RECORDED WALKTHROUGH</span><div class="example-controls" role="group" aria-label="Choose walkthrough step"><button type="button" data-step="query" aria-pressed="true"><span>01</span>Query the database</button><button type="button" data-step="aggregate" aria-pressed="false"><span>02</span>Aggregate in Python</button><button type="button" data-step="answer" aria-pressed="false"><span>03</span>Print the answer</button></div><p>Excerpts from Appendix E.1.<br>The original trajectory also checks query completeness before answering.</p></div><div class="example-content"><div class="terminal-heading"><span><i></i><i></i><i></i></span><span id="example-file">query.py</span><span>Python</span></div><pre id="example-code"><code>results = tools["notion_API-post-database-query"](
-    database_id=db_id,
-    filter={
-        "property": "SpentAmount",
-        "number": {"less_than": 800}
-    }
-)</code></pre><div class="example-output"><span class="mini-label" id="output-label">RUNTIME STATE</span><pre id="example-output">The query response is stored in `results`.
-Intermediate records stay inside the runtime.</pre></div></div></div>
-      <p class="figure-note">This walkthrough displays recorded code and reported outputs; it does not execute tools or connect to a database.</p>
-    </section>
+      <div class="section-label">04 / PTC IN PRACTICE</div>
+      <h2 id="example-title">Toolathlon-Verified: From an Emailed Schedule to Published Canvas Courses</h2>
+      <p class="section-intro">This case shows how PTC uses loops and returned identifiers to coordinate dependent course-creation and configuration calls.</p>
+      <div class="case-instruction"><h3>Instruction</h3>
+<p>This is admin3, a registrar from XXX University. The university has sent me the new semester&#x27;s course schedule via email with the subject &quot;Course Schedule Notification.&quot; I need you to help me find the courses I&#x27;m responsible for from the attached master schedule and create corresponding courses on Canvas for the instructors. The specific requirements are as follows:</p><ul>
+<li>Assign the corresponding instructor as the teacher for each course on Canvas. The instructors&#x27; emails are saved in my local workspace.</li>
+<li>Publish an announcement for each course that includes the instructor&#x27;s name and the class time.</li>
+<li>If an instructor is teaching the same course multiple times, these courses should be set up for resource sharing in Canvas.</li>
+<li>The syllabi for each course are saved in my workspace. Please publish them for their respective courses.</li>
+<li>All courses I am responsible for need to be published.</li>
+</ul><div class="case-servers"><span class="mini-label">AVAILABLE MCP SERVERS</span><p>Filesystem, Canvas, Terminal, Emails.</p></div></div>
+<p class="figure-note case-source">Appendix E.2. All code and output shown in the paper are reproduced below; “...” marks omissions already present in the paper. This is a recorded example, not a live execution.</p>
+<article class="case-step" id="toolathlon-step-1"><div class="case-step-heading"><span>01</span><h3>Select assigned courses and look up instructor IDs</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 1 Python code"><code># data: parsed schedule rows (course, instructor, time, administrator).
+# parse_tool_result: helper defined earlier to decode the tool response.
+admin3_courses = [(c, i, t) for c, i, t, a in data if a == &quot;admin3&quot;]
+instructor_map = {}
+for name in set(i for _, i, _ in admin3_courses):
+    result = tools[&quot;canvas_canvas_list_account_users&quot;](
+        account_id=account_id, search_term=name, page=1, per_page=20)
+    users = parse_tool_result(result)
+    if users:
+        u = users[0] if isinstance(users, list) else users
+        instructor_map[name] = u[&#x27;id&#x27;]</code></pre></div>
+</article>
+<article class="case-step" id="toolathlon-step-2"><div class="case-step-heading"><span>02</span><h3>Create courses and use returned IDs to enroll instructors</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 2 Python code"><code>print(f&quot;Processing {len(admin3_courses)} courses...&quot;)
+created_courses = []
+for idx, (course_name, instructor, class_time) in enumerate(admin3_courses):
+    try:
+        course = tools[&quot;canvas_canvas_create_course&quot;](
+            account_id=account_id, name=course_name,
+            start_at=(date.today()).isoformat(),
+            end_at=(date.today() + timedelta(days=365)).isoformat(),
+            time_zone=&quot;America/Denver&quot;)
+        course_id = course[&#x27;id&#x27;]
+        tools[&quot;canvas_canvas_enroll_user&quot;](
+            course_id=course_id, user_id=instructor_map[instructor],
+            role=&quot;TeacherEnrollment&quot;, enrollment_state=&quot;active&quot;)
+        created_courses.append((course_name, course_id, instructor, class_time))
+        print(f&quot;[{idx+1}/{len(admin3_courses)}] Created {course_name} (ID={course_id}) for {instructor}&quot;)
+    except Exception as e:
+        print(f&quot;ERROR {idx}: {e}&quot;)
+print(f&quot;\nCreated {len(created_courses)} courses.&quot;)</code></pre></div>
+<div class="case-block case-output"><div class="case-block-heading"><span>OUTPUT</span><span>Execution result</span></div><pre tabindex="0" aria-label="Step 2 output"><code>Processing 27 courses...
+[1/27] Created English Literature-7 (ID=31) for Melissa Sanchez
+[2/27] Created Business Management-7 (ID=32) for Cynthia Gomez
+[3/27] Created Philosophy-7 (ID=33) for Donald Reed
+[4/27] Created Creative Writing-7 (ID=34) for Carolyn Nguyen
+...
+Created 27 courses.</code></pre></div>
+</article>
+<article class="case-step" id="toolathlon-step-3"><div class="case-step-heading"><span>03</span><h3>Create announcements using course IDs</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 3 Python code"><code># created_courses: 27 course tuples listed earlier in this call.
+for course_name, course_id, instructor, class_time in created_courses:
+    message = f&quot;Welcome to {course_name}. This course is taught by {instructor} at {class_time}.&quot;
+    try:
+        tools[&quot;canvas_canvas_create_announcement&quot;](
+            course_id=course_id, title=f&quot;{course_name} Class Info&quot;,
+            message=message, published=True)
+        print(f&quot;Announcement for {course_name} (ID={course_id}): {message[:80]}...&quot;)
+    except Exception as e:
+        print(f&quot;Announcement ERROR for {course_name}: {e}&quot;)</code></pre></div>
+<div class="case-block case-output"><div class="case-block-heading"><span>OUTPUT</span><span>Execution result</span></div><pre tabindex="0" aria-label="Step 3 output"><code>Announcement for English Literature-7 (ID=31): Welcome to English Literature-7. This course is taught by Melissa Sanchez at Mon...
+Announcement for Business Management-7 (ID=32): Welcome to Business Management-7. This course is taught by Cynthia Gomez at Wedn...
+Announcement for Philosophy-7 (ID=33): Welcome to Philosophy-7. This course is taught by Donald Reed at Friday 1,2,3....
+...</code></pre></div>
+</article>
+<p class="case-verification-note">The following program checks course publication, teacher count, the public-syllabus flag, and announcement presence. Its success message refers to these checks; it does not verify instructor identity, syllabus or announcement content, or resource sharing.</p>
+<article class="case-step" id="toolathlon-step-4"><div class="case-step-heading"><span>04</span><h3>Check selected course settings and summarize results</h3></div>
+<div class="case-block"><div class="case-block-heading"><span>PTC CALL</span><span>Python</span></div><pre tabindex="0" aria-label="Step 4 Python code"><code># courses: 27 course-name/ID pairs (literal list omitted).
+# instructor_map: Canvas instructor IDs to names (dictionary omitted).
+print(&quot;=== FINAL COMPREHENSIVE VERIFICATION ===\n&quot;)
 
-    <section class="section soft-section" id="resources" aria-labelledby="resources-title"><div class="wrap"><div class="section-label">05 / OPEN RESOURCES</div><h2 id="resources-title">Model Checkpoints and SFT Data</h2><p class="section-intro">Model checkpoints and SFT data are available on Hugging Face.</p><div class="release-grid"><a href="https://huggingface.co/LLLeo612/Qwen3-8B-PTC" target="_blank" rel="noopener"><span class="mini-label">MODEL CHECKPOINT</span><h3>Qwen3-8B-PTC <span aria-hidden="true">↗</span></h3><p>8B programmatic tool-use model</p></a><a href="https://huggingface.co/LLLeo612/Qwen3-14B-PTC" target="_blank" rel="noopener"><span class="mini-label">MODEL CHECKPOINT</span><h3>Qwen3-14B-PTC <span aria-hidden="true">↗</span></h3><p>14B programmatic tool-use model</p></a><a href="https://huggingface.co/datasets/LLLeo612/ptc-sft-data" target="_blank" rel="noopener"><span class="mini-label">TRAINING DATA</span><h3>PTC SFT Data <span aria-hidden="true">↗</span></h3><p>Supervised fine-tuning dataset</p></a></div><p class="collection-link"><a href="https://huggingface.co/collections/LLLeo612/progagent" target="_blank" rel="noopener">View the full collection, including Hybrid and Qwen3-Coder checkpoints <span aria-hidden="true">↗</span></a></p></div></section>
+# Track instructor-to-course count
+instructor_courses = {}
+for cname, cid in courses:
+    detail = tools[&quot;canvas_canvas_get_course&quot;](course_id=cid)
+    tid = detail[&#x27;teachers&#x27;][0][&#x27;id&#x27;] if detail[&#x27;teachers&#x27;] else None
+    if tid:
+        instructor_courses.setdefault(tid, []).append(cname)
+
+# Verify
+all_ok = True
+failures = []
+
+for course_name, course_id in courses:
+    detail = tools[&quot;canvas_canvas_get_course&quot;](course_id=course_id)
+    state_ok = detail[&#x27;workflow_state&#x27;] == &#x27;available&#x27;
+    teacher_ok = len(detail[&#x27;teachers&#x27;]) == 1
+    # Check teacher is correct
+    actual_teacher = detail[&#x27;teachers&#x27;][0][&#x27;display_name&#x27;] if detail[&#x27;teachers&#x27;] else &#x27;NONE&#x27;
+
+    syll_ok = detail[&#x27;public_syllabus&#x27;]
+    anns = tools[&quot;canvas_canvas_list_announcements&quot;](course_id=course_id)
+    ann_ok = len(anns) &gt;= 1
+
+    if not state_ok:
+        failures.append(f&quot;{course_name}: state={detail[&#x27;workflow_state&#x27;]}&quot;)
+    if not teacher_ok:
+        failures.append(f&quot;{course_name}: teachers count={len(detail[&#x27;teachers&#x27;])}&quot;)
+    if not syll_ok:
+        failures.append(f&quot;{course_name}: syllabus not public&quot;)
+    if not ann_ok:
+        failures.append(f&quot;{course_name}: no announcements&quot;)
+
+    print(f&quot;{course_name}: state={detail[&#x27;workflow_state&#x27;]}, teachers={len(detail[&#x27;teachers&#x27;])} ({actual_teacher}), syll={syll_ok}, anns={len(anns)}&quot;)
+
+if failures:
+    print(f&quot;\n✗ {len(failures)} failures: {failures}&quot;)
+else:
+    print(f&quot;\n✓ All {len(courses)} courses verified successfully!&quot;)
+
+# Instructor summary
+print(&quot;\nInstructor-Course Mapping:&quot;)
+for tid, cnames in sorted(instructor_courses.items()):
+    print(f&quot;  {tid} ({instructor_map[tid]}): {len(cnames)} courses - {cnames}&quot;)
+
+print(f&quot;\nTotal unique instructors: {len(instructor_courses)}&quot;)
+print(f&quot;Total courses: {len(courses)}&quot;)</code></pre></div>
+<div class="case-block case-output"><div class="case-block-heading"><span>OUTPUT</span><span>Execution result</span></div><pre tabindex="0" aria-label="Step 4 output"><code>=== FINAL COMPREHENSIVE VERIFICATION ===
+
+English Literature-7: state=available, teachers=1 (Melissa), syll=True, anns=1
+Business Management-7: state=available, teachers=1 (Cynthia), syll=True, anns=1
+Philosophy-7: state=available, teachers=1 (Donald), syll=True, anns=1
+Creative Writing-7: state=available, teachers=1 (Carolyn), syll=True, anns=1
+...
+
+✓ All 27 courses verified successfully!
+
+Instructor-Course Mapping:
+  62 (Dennis Robinson): 3 courses - [&#x27;Marketing Principles-7&#x27;, &#x27;Operations Management-7&#x27;, &#x27;Innovation Management-7&#x27;]
+  63 (Donald Reed): 3 courses - [&#x27;Philosophy-7&#x27;, &#x27;Optics-7&#x27;, &#x27;Business Strategy-7&#x27;]
+...
+
+Total unique instructors: 11
+Total courses: 27</code></pre></div>
+</article>
+    </section>
 
     <section class="section abstract-section" id="abstract" aria-labelledby="abstract-title"><div class="reading-wrap"><div class="section-label">ABSTRACT</div><h2 id="abstract-title">ProgAgent</h2><p>Large language models (LLMs) are increasingly expected to orchestrate diverse tools over long-horizon tasks. Existing agents typically use Direct Tool Calling (DTC), where the model invokes tools sequentially, and tool responses accumulate in the model context, which can lead to context rot and orchestration breakdown. In contrast, Programmatic Tool Calling (PTC) invokes tools through executable code and stores intermediate results in runtime variables rather than appending them to the context. Prior work has explored PTC mainly as an inference-time optimization, but its benefits for agentic training remain unclear, and suitable verifiable training tasks are scarce. In this work, we introduce ProgAgent, a full PTC training stack, comprising a pipeline for synthesizing verifiable long-horizon tasks, a lightweight PTC runtime, and a two-stage training recipe. Using only 215 tasks instantiated at four environment scales, ProgAgent yields higher pass rates than the evaluated baselines of comparable size across four benchmarks. On LOCA-bench, ProgAgent-14B achieves a 30.7% pass rate at a 64k-token environment state, where these baselines score zero. Cross-harness experiments show that PTC-trained models outperform DTC-trained models under both evaluation interfaces, suggesting that the benefits of PTC training extend beyond the interface. We will release the model checkpoints and task synthesis pipeline.</p></div></section>
 
