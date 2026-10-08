@@ -79,6 +79,6 @@ uv run --with pymupdf python scripts/import-paper.py \
 
 ## 内容依据
 
-作者、机构与摘要依据所提供 PDF 的首页；方法图为 Figure 1；DTC/PTC 对比为 Figure 2；实验展示 Tables 1–3 和 Figure 3；Analysis 展示 Figures 4、7、8 和 Tables 4–6、8，对应论文 §5.1–5.4，正文精简为各小节的关键结论；案例依据 Appendix E.1。案例是记录回放，不会调用外部工具。所有百分比为论文报告值，不代表独立复现。
+作者、机构与摘要依据所提供 PDF 的首页；首屏之后直接展示 Figure 1，突出可验证环境合成与规模扩展；实验展示 Tables 1–3 和 Figure 3；Analysis 展示 Figures 4、7、8 和 Tables 4–6、8，对应论文 §5.1–5.4，正文精简为各小节的关键结论；案例依据 Appendix E.1。案例是记录回放，不会调用外部工具。所有百分比为论文报告值，不代表独立复现。
 
 页面没有添加未经确认的会议录用信息、arXiv 编号或训练代码链接。AI 辅助实现；公开维护时请核对作者信息、实验数字和后续发布资源。
