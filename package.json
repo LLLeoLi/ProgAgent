@@ -5,6 +5,8 @@
   "description": "Academic project page for ProgAgent",
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "check": "node --check dist/app.js && node scripts/check.mjs"
+    "check": "node --check dist/app.js && node scripts/check.mjs",
+    "build": "node scripts/version-assets.mjs",
+    "prestart": "npm run build"
   }
 }

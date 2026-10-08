@@ -1,6 +1,6 @@
 # ProgAgent project page
 
-独立的 ProgAgent 论文展示网站。纯 HTML / CSS / JavaScript，无前端依赖、无构建步骤，可直接通过 GitHub Pages 发布。
+独立的 ProgAgent 论文展示网站。纯 HTML / CSS / JavaScript，无前端依赖，发布前自动生成 CSS/JS 内容版本文件名，可直接通过 GitHub Pages 发布。
 
 - 目标网站：<https://llleoli.github.io/ProgAgent/>
 - 论文：*ProgAgent: Learning Tool Orchestration through Programmatic Training*
@@ -22,10 +22,11 @@ npm start
 ## 校验
 
 ```bash
+npm run build
 npm run check
 ```
 
-检查 JavaScript 语法、重复 HTML ID、页内导航、本地资源与图片替代文字。页面支持 8B/14B 摘要数字切换、原始图表放大、Toolathlon 案例分步切换、Python 语法高亮和换行控制、BibTeX 复制、移动端布局及键盘操作。宽表在手机上可横向滚动；点击图表可放大查看。
+检查 JavaScript 语法、重复 HTML ID、页内导航、本地资源与图片替代文字。页面支持 8B/14B 摘要数字切换、原始图表放大、Toolathlon 案例分步切换、Python 语法高亮和自动换行、BibTeX 复制、移动端布局及键盘操作。宽表在手机上可横向滚动；点击图表可放大查看。
 
 ## 文件结构
 
@@ -45,6 +46,7 @@ dist/
 scripts/
   serve.mjs              本地静态服务器
   check.mjs              页面完整性检查
+  version-assets.mjs     为 CSS/JS 生成内容哈希文件名，避免缓存混用
   import-paper.py        从源文件与 PDF 导出图表
 .github/workflows/
   pages.yml              GitHub Pages 自动部署
@@ -79,6 +81,10 @@ uv run --with pymupdf python scripts/import-paper.py \
 
 ## 内容依据
 
-摘要及 BibTeX 作者依据所提供 PDF 的首页；首屏与页脚不展示作者信息；首屏之后直接展示 Figure 1，突出可验证环境合成与规模扩展；实验展示 Tables 1–3 和 Figure 3；Analysis 展示 Figures 4、7、8 和 Tables 4–6、8，对应论文 §5.1–5.4，正文精简为各小节的关键结论；案例完整展示 Appendix E.2 中的 Toolathlon-Verified 任务要求、四步代码及论文列出的输出，保留原有省略号与最终检查范围说明。案例是记录回放，不会调用外部工具。所有百分比为论文报告值，不代表独立复现。
+BibTeX 作者依据所提供 PDF 的首页；首屏与页脚不展示作者信息；首屏之后直接展示 Figure 1，突出可验证环境合成与规模扩展；实验展示 Tables 1–3 和 Figure 3；Analysis 展示 Figures 4、7、8 和 Tables 4–6、8，对应论文 §5.1–5.4，正文精简为各小节的关键结论；案例完整展示 Appendix E.2 中的 Toolathlon-Verified 任务要求、四步代码及论文列出的输出，保留原有省略号与最终检查范围说明。案例是记录回放，不会调用外部工具。所有百分比为论文报告值，不代表独立复现。
 
 页面没有添加未经确认的会议录用信息、arXiv 编号。AI 辅助实现；公开维护时请核对作者信息、实验数字和后续发布资源。
+
+## 资源缓存
+
+继续编辑 `dist/styles.css` 和 `dist/app.js`，然后运行 `npm run build`。该命令生成带内容哈希的文件并更新 HTML 引用；不要手工编辑哈希文件。GitHub Actions 发布前和 `npm start` 启动前都会自动执行。新版 HTML 使用新的 CSS/JS URL，避免浏览器缓存旧资源。
