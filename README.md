@@ -31,7 +31,7 @@ npm run check
 
 ```text
 dist/
-  index.html             页面正文、作者、链接和引用
+  index.html             页面正文、链接和引用
   styles.css             响应式样式
   app.js                 交互及论文表 2 的摘要数字
   assets/
@@ -52,12 +52,12 @@ scripts/
 
 ## 更新内容
 
-- 修改标题、作者、论文/模型/数据链接：`dist/index.html`。
+- 修改标题、论文/模型/数据链接：`dist/index.html`。
 - 更新 8B/14B 摘要数字：`dist/app.js` 中 `scores`，同时更新 HTML 默认显示的 14B 结果、首屏统计和相关文案。正文的完整图表直接来自论文。
 - 更新 Experimental Results 与 Analysis：`dist/index.html` 的 `#results` / `#analysis`，文案沿用论文对应小节的表述。
 - 更新论文：替换 `dist/assets/ProgAgent.pdf`，并同步图表、原图和引用信息。
-- 训练代码尚未提供公开链接，页面标记为 Coming soon。不要把本网站源码仓库误标为训练代码。
-- BibTeX 暂用 `@unpublished`；有 arXiv 或正式发表信息后应替换为正式引用。
+- GitHub 按钮指向用户提供的代码仓库：<https://github.com/LLLeoLi/verl>。模型与 SFT 数据按钮使用 Hugging Face 标识。
+- BibTeX 按用户提供的格式使用 `@misc{li2026progagent}`，年份为 2026，URL 为项目页；作者列表保留论文信息。
 
 ## 导入论文图表
 
@@ -79,6 +79,6 @@ uv run --with pymupdf python scripts/import-paper.py \
 
 ## 内容依据
 
-作者、机构与摘要依据所提供 PDF 的首页；首屏之后直接展示 Figure 1，突出可验证环境合成与规模扩展；实验展示 Tables 1–3 和 Figure 3；Analysis 展示 Figures 4、7、8 和 Tables 4–6、8，对应论文 §5.1–5.4，正文精简为各小节的关键结论；案例完整展示 Appendix E.2 中的 Toolathlon-Verified 任务要求、四步代码及论文列出的输出，保留原有省略号与最终检查范围说明。案例是记录回放，不会调用外部工具。所有百分比为论文报告值，不代表独立复现。
+摘要及 BibTeX 作者依据所提供 PDF 的首页；首屏与页脚不展示作者信息；首屏之后直接展示 Figure 1，突出可验证环境合成与规模扩展；实验展示 Tables 1–3 和 Figure 3；Analysis 展示 Figures 4、7、8 和 Tables 4–6、8，对应论文 §5.1–5.4，正文精简为各小节的关键结论；案例完整展示 Appendix E.2 中的 Toolathlon-Verified 任务要求、四步代码及论文列出的输出，保留原有省略号与最终检查范围说明。案例是记录回放，不会调用外部工具。所有百分比为论文报告值，不代表独立复现。
 
-页面没有添加未经确认的会议录用信息、arXiv 编号或训练代码链接。AI 辅助实现；公开维护时请核对作者信息、实验数字和后续发布资源。
+页面没有添加未经确认的会议录用信息、arXiv 编号。AI 辅助实现；公开维护时请核对作者信息、实验数字和后续发布资源。
