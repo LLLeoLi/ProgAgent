@@ -1,0 +1,108 @@
+[
+  {
+    "asset": "overview.svg",
+    "label": "Figure 1",
+    "source": "figures/overview.pdf",
+    "width": 723,
+    "height": 293
+  },
+  {
+    "asset": "ptc-dtc.svg",
+    "label": "Figure 2",
+    "source": "figures/ptc_dtc.pdf",
+    "width": 870,
+    "height": 343
+  },
+  {
+    "asset": "training-paradigms.png",
+    "label": "Figure 3",
+    "source": "figures/ablation_overview_loca.pdf",
+    "width": 388,
+    "height": 142
+  },
+  {
+    "asset": "training-dynamics-14b.svg",
+    "label": "Figure 4",
+    "source": "figures/training_dynamics_14B.pdf",
+    "width": 391,
+    "height": 143
+  },
+  {
+    "asset": "environment-scaling.svg",
+    "label": "Figure 7",
+    "source": "figures/env_scaling_harness.pdf",
+    "width": 377,
+    "height": 125
+  },
+  {
+    "asset": "training-dynamics-8b.svg",
+    "label": "Figure 8",
+    "source": "figures/training_dynamics_8B.pdf",
+    "width": 391,
+    "height": 143
+  },
+  {
+    "asset": "table-1.svg",
+    "label": "Table 1",
+    "source": "tables/baseline_overview.tex",
+    "compiled_page": 6,
+    "width": 398,
+    "height": 58
+  },
+  {
+    "asset": "table-2.svg",
+    "label": "Table 2",
+    "source": "tables/main_results.tex",
+    "compiled_page": 6,
+    "width": 398,
+    "height": 246
+  },
+  {
+    "asset": "table-3.svg",
+    "label": "Table 3",
+    "source": "tables/paradigm_comparison.tex",
+    "compiled_page": 7,
+    "width": 398,
+    "height": 109
+  },
+  {
+    "asset": "table-4.svg",
+    "label": "Table 4",
+    "source": "tables/env_scale.tex",
+    "compiled_page": 8,
+    "width": 258,
+    "height": 70
+  },
+  {
+    "asset": "table-5.svg",
+    "label": "Table 5",
+    "source": "tables/programming_structures.tex",
+    "compiled_page": 8,
+    "width": 234,
+    "height": 44
+  },
+  {
+    "asset": "table-6.svg",
+    "label": "Table 6",
+    "source": "tables/dtc_transfer_loca.tex",
+    "compiled_page": 9,
+    "width": 374,
+    "height": 98
+  },
+  {
+    "asset": "table-7.svg",
+    "label": "Table 7",
+    "source": "tables/ablations_loca.tex",
+    "compiled_page": 21,
+    "width": 398,
+    "height": 559
+  },
+  {
+    "asset": "table-8.svg",
+    "label": "Table 8",
+    "source": "tables/mcpmark_interaction_costs.tex",
+    "compiled_page": 22,
+    "width": 279,
+    "height": 130
+  }
+]

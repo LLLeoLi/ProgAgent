@@ -1,0 +1,10 @@
+{
+  "name": "progagent-project-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Academic project page for ProgAgent",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "check": "node --check dist/app.js && node scripts/check.mjs"
+  }
+}
